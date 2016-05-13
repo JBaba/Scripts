@@ -18,7 +18,7 @@ public class DateAfterBankingHolidays {
 	public String[] bankHolidays2016 = {"1/1/2016","1/18/2016","2/15/2016","5/30/2016","7/4/2016","9/5/2016","10/10/2016",
 			"11/11/2016","11/24/2016","12/26/2016"};
 
-	public void findNextDate(String pramDate) throws Exception{
+	public void findNextDate(String pramDate,String jobid) throws Exception{
 		
 		SimpleDateFormat date = new SimpleDateFormat("MM/dd/yyyy");
 		Timestamp[] timeStampBankHolidays2016 = new Timestamp[bankHolidays2016.length];
@@ -43,8 +43,9 @@ public class DateAfterBankingHolidays {
 			index++;
 		}
 		
+		System.out.println(date.parse(pramDate).getTime());
 		Timestamp paramTs = new Timestamp(date.parse(pramDate).getTime());
-		Timestamp foundDay = getBankBusinessDayAfterNDays(paramTs, 2, timeStampBankHolidays2016);
+		Timestamp foundDay = getBankBusinessDayAfterNDays(paramTs, 2, timeStampBankHolidays2016,jobid);
 		System.out.println(pramDate+":"+foundDay);
 	}
 	
@@ -56,8 +57,9 @@ public class DateAfterBankingHolidays {
 	 * @param int - days from today
 	 * @return Timestamp - Timestamp of the day n days from today
 	 */
-	public static Timestamp getBankBusinessDayAfterNDays(Timestamp ts, int n,Timestamp[] timeStampBankHolidays) {
+	public static Timestamp getBankBusinessDayAfterNDays(Timestamp ts, int n,Timestamp[] timeStampBankHolidays,String jobid) {
         Calendar cal = new GregorianCalendar();
+        Timestamp oldDate = new Timestamp(ts.getTime());
         
         cal.setTime(ts);
         
@@ -92,20 +94,59 @@ public class DateAfterBankingHolidays {
               ts.setTime(cal.getTime().getTime());
               n--;
         }
+        
+        // Find next month date except weekends and holidays
+        if(jobid.equalsIgnoreCase("IN-EFTS-MLY")){
+        	System.out.println("It's monthly :"+ts);
+        	if(oldDate.getMonth() == ts.getMonth()){
+        		Calendar nextMonthDate = new GregorianCalendar();
+        		nextMonthDate.setTime(ts);
+        		nextMonthDate.add(Calendar.MONTH, 1);
+        		nextMonthDate.set(Calendar.DATE, nextMonthDate.getActualMinimum(Calendar.DAY_OF_MONTH));
+        		
+        		 while (nextMonthDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+	                          || nextMonthDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+        			 nextMonthDate.add(Calendar.DAY_OF_MONTH, 1);
+	              }
+	              
+	              for(Timestamp compareDate:timeStampBankHolidays){
+	            	  long nextTime = nextMonthDate.getTime().getTime();
+	            	  if(compareDate.compareTo(new Timestamp(nextTime)) == 0){
+	            		  nextMonthDate.add(Calendar.DAY_OF_MONTH, 1);
+	            	  }
+	              }
+	              
+	              while (nextMonthDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY
+	                      || nextMonthDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) {
+	            	  nextMonthDate.add(Calendar.DAY_OF_MONTH, 1);
+	              }
+	              
+	              ts.setTime(nextMonthDate.getTime().getTime());
+        	}
+        }
+        
         return ts;
 	}
 	
 	public static void main(String[] args) throws Exception {
 		DateAfterBankingHolidays dab = new DateAfterBankingHolidays();
-		dab.findNextDate("12/30/2015");
+		dab.findNextDate("12/30/2015","DLY");
 		System.out.println(":------------------------------:");
-		dab.findNextDate("1/14/2016");
+		dab.findNextDate("1/14/2016","DLY");
 		System.out.println(":------------------------------:");
-		dab.findNextDate("1/15/2016");
+		dab.findNextDate("1/15/2016","DLY");
 		System.out.println(":------------------------------:");
-		dab.findNextDate("11/23/2016");
+		dab.findNextDate("11/23/2016","DLY");
 		System.out.println(":------------------------------:");
-		dab.findNextDate("11/22/2016");
+		dab.findNextDate("11/22/2016","DLY");
+		System.out.println(":------------------------------:");
+		dab.findNextDate("12/28/2016","DLY");
+		System.out.println(":------------------------------:");
+		dab.findNextDate("12/25/2015","IN-EFTS-MLY");
+		System.out.println(":------------------------------:");
+		dab.findNextDate("5/27/2016","IN-EFTS-MLY");
+		System.out.println(":------------------------------:");
+		dab.findNextDate("5/30/2016","IN-EFTS-MLY");
 	}
 
 }
