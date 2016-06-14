@@ -50,6 +50,84 @@ for(i=0;i<5;i++){
 	AjaxCall();
 }
 
+function(url, cb, options, async) {
+
+    if (async == undefined) async = this.options.async;
+
+    if (options == undefined) options = this.options;
+
+
+
+    var xhr = new XMLHttpRequest();    
+
+    if ('withCredentials' in xhr) {
+
+    xhr.open('GET', url, async);
+
+    } else if (typeof XDomainRequest != "undefined") {
+
+    xhr = new XDomainRequest(); //for IE
+
+    xhr.open('GET', url);
+
+    } else {
+
+    xhr.open('GET', url, async);
+
+    }
+
+    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+
+    xhr.setRequestHeader('Access-Control-Allow-Methods', 'GET');
+
+ 
+
+    try {
+
+      xhr.overrideMimeType('text/xml'); // unsupported by IE
+
+    } catch(e) {}
+
+
+
+    xhr.onreadystatechange = function() {
+
+      if (xhr.readyState != 4) return;
+
+      if(xhr.status == 200){
+
+          if(xhr.responseXML){
+
+              cb(xhr.responseXML, options);
+
+          }else {
+
+              try{
+
+                  var parser = new DOMParser();
+
+                  cb(parser.parseFromString(xhr.response, "text/xml"), options);
+
+              } catch (e){
+
+                  console.log(e);
+
+              }
+
+          }
+
+      } else { 
+
+    alert(url+' could not be loaded - please check if the file exists and if it is loaded from the same domain as the website!'); 
+
+      }
+
+    };
+
+    xhr.send(null);
+
+  }
+
 </script>
 </head>
 
