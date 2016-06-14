@@ -1,0 +1,59 @@
+<html>
+
+<head>
+<script>
+
+function GetXmlHttpObject() {
+	if (window.XMLHttpRequest) {
+		// code for IE7+, Firefox, Chrome, Opera, Safari
+		return new XMLHttpRequest();
+	}
+	if (window.ActiveXObject) {
+		// code for IE6, IE5
+		return new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	return null;
+}
+
+function AjaxCall(){
+	
+	xmlhttp=GetXmlHttpObject();
+	if (xmlhttp==null){
+	  return;
+	}
+	
+	var url="https://10.28.117.240/wp/ControllerServlet?PAGE_ID=FWAJA&AJAXsource=DefaultSRC&ACTION=getPayeeDetails&token=5c71fbd08ac6a96a732189ae9&sid=0.5613061562510574&caseNo=200002122&client=100019428&vendorID=13316";
+	xmlhttp.onreadystatechange=processResponce;
+	xmlhttp.open("GET",url,true);
+	xmlhttp.setRequestHeader('Access-Control-Allow-Origin', '*');
+    //xmlhttp.setRequestHeader('Access-Control-Allow-Methods', 'GET');
+	xmlhttp.send(null);
+}
+
+function processResponce() {
+		if (xmlhttp.readyState == 4) {
+	       	if (xmlhttp.status == 200) {                                                                        
+		       	if(xmlhttp.responseText!=''){
+		       		var output = xmlhttp.responseText;
+		       		if(output != null)	{
+						var text = xmlhttp.responseText;
+						var testStr = text.split("-");
+						// Process responseText
+		       		}
+		       	}
+	       	}
+		}
+}
+
+var i=0;
+for(i=0;i<5;i++){
+	AjaxCall();
+}
+
+</script>
+</head>
+
+<body>
+</body>
+
+</html>
