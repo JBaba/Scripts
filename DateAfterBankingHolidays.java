@@ -57,8 +57,9 @@ public class DateAfterBankingHolidays {
 	 * @param int - days from today
 	 * @return Timestamp - Timestamp of the day n days from today
 	 */
-	public static Timestamp getBankBusinessDayAfterNDays(Timestamp ts, int n,Timestamp[] timeStampBankHolidays,String jobid) {
+	public static Timestamp getBankBusinessDayAfterNDays(Timestamp input, int n,Timestamp[] timeStampBankHolidays,String jobid) {
         Calendar cal = new GregorianCalendar();
+        Timestamp ts = new Timestamp(input.getTime());
         Timestamp oldDate = new Timestamp(ts.getTime());
         
         cal.setTime(ts);
